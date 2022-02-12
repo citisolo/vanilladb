@@ -22,6 +22,21 @@ function get_cockroach_db_operator(){
 }
 
 function use_cluster(){
-    kubectl run cockroachdb -it --image=cockroachdb/cockroach --rm --restart=Never -- sql --insecure --host=cockroachdb-public
+    kubectl exec -it cockroachdb-client-secure -- ./cockroach sql --certs-dir=/cockroach/cockroach-certs --host=cockroachdb-public
 }
 
+function shutdown_cluster(){
+    kubectl delete -f db_deployment.yaml
+    # kubectl delete -f db_client_secure_operator.yaml
+    kubectl delete -f db_operator.yaml
+}
+
+function bringup_cluster(){
+    kubectl apply -f db_operator.yaml
+    kubectl apply -f db_deployment.yaml
+}
+
+
+function create_fs_cluster(){
+    kubectl create -f crds.yaml -f common.yaml -f operator.yaml
+}
